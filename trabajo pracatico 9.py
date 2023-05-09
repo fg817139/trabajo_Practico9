@@ -1,50 +1,50 @@
 from typing import Dict, Any
 
-
 class AnalizadorEventos:
     def __init__(self, nombre_archivo: str):
         self.nombre_archivo = nombre_archivo
 
     def procesar_eventos(self) -> Dict[str, Any]:
-        total_eventos = 0
         eventos_por_tipo = {}
         eventos_por_servidor = {}
+        total_eventos = 0
 
-        with open(self.nombre_archivo, 'r') as file:
+        with open(self.nombre_archivo, "r", encoding="utf-8") as archivo:
             while True:
-                linea_fecha = file.readline()
-                if not linea_fecha:
+                fecha = archivo.readline().strip()
+                if not fecha:
                     break
+                hora = archivo.readline().strip()
+                servidor_linea = archivo.readline().strip()
+                servidor = servidor_linea.split(": ")[1]
+                tipo_evento_linea = archivo.readline().strip()
+                tipo_evento = tipo_evento_linea.split(": ")[1]
+                descripcion = archivo.readline().strip()
+
+                archivo.readline()  # Lee la línea en blanco entre registros
 
                 total_eventos += 1
 
-                file.readline()  # Salta la línea de la hora
-
-                linea_servidor = file.readline().strip()
-                nombre_servidor = linea_servidor.split(': ')[1]
-                if nombre_servidor in eventos_por_servidor:
-                    eventos_por_servidor[nombre_servidor] += 1
-                else:
-                    eventos_por_servidor[nombre_servidor] = 1
-
-                linea_tipo_evento = file.readline().strip()
-                tipo_evento = linea_tipo_evento.split(': ')[1]
                 if tipo_evento in eventos_por_tipo:
                     eventos_por_tipo[tipo_evento] += 1
                 else:
                     eventos_por_tipo[tipo_evento] = 1
 
-                file.readline()  # Salta la línea de la descripción
-                file.readline()  # Salta la línea en blanco entre registros
+                if servidor in eventos_por_servidor:
+                    eventos_por_servidor[servidor] += 1
+                else:
+                    eventos_por_servidor[servidor] = 1
 
-        return {
-            'total_eventos': total_eventos,
-            'eventos_por_tipo': eventos_por_tipo,
-            'eventos_por_servidor': eventos_por_servidor
+        estadisticas = {
+            "total_eventos": total_eventos,
+            "eventos_por_tipo": eventos_por_tipo,
+            "eventos_por_servidor": eventos_por_servidor,
         }
+        return estadisticas
 
 
-# Ejemplo de uso:
-analizador = AnalizadorEventos('eventos.txt')
-resultados = analizador.procesar_eventos()
-print(resultados)
+# Uso de la clase:
+nombre_archivo = "eventos.txt"
+analizador = AnalizadorEventos(nombre_archivo)
+estadisticas = analizador.procesar_eventos()
+print(estadisticas)
